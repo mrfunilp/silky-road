@@ -1,0 +1,90 @@
+<main class="min-h-dvh flex items-center justify-center bg-slate-100 px-4">
+  <div class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
+    @if (registeredUser(); as user) {
+      <h1 class="text-2xl font-semibold text-slate-900">Account created</h1>
+      <p class="mt-2 text-sm text-slate-600">Welcome, {{ user }}! You can now sign in.</p>
+      <a
+        routerLink="/login"
+        class="mt-6 block w-full rounded-lg bg-slate-900 py-2.5 text-center font-medium text-white hover:bg-slate-700"
+      >
+        Go to sign in
+      </a>
+    } @else {
+      <h1 class="text-2xl font-semibold text-slate-900">Create account</h1>
+
+      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4" novalidate>
+        <div>
+          <label for="username" class="block text-sm font-medium text-slate-700">Username</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            autocomplete="username"
+            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+          />
+          @if (form.controls.username.touched && form.controls.username.invalid) {
+            <p class="mt-1 text-xs text-red-600">Username must be 3–20 characters.</p>
+          }
+        </div>
+
+        <div>
+          <label for="email" class="block text-sm font-medium text-slate-700">Email</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+          />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <p class="mt-1 text-xs text-red-600">Enter a valid email address.</p>
+          }
+        </div>
+
+        <div>
+          <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+          />
+          @if (form.controls.password.touched && form.controls.password.invalid) {
+            <p class="mt-1 text-xs text-red-600">Password must be at least 8 characters.</p>
+          }
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="block text-sm font-medium text-slate-700">Confirm password</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+          />
+          @if (form.controls.confirmPassword.touched && form.hasError('passwordMismatch')) {
+            <p class="mt-1 text-xs text-red-600">Passwords do not match.</p>
+          }
+        </div>
+
+        @if (error()) {
+          <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ error() }}</p>
+        }
+
+        <button
+          type="submit"
+          class="w-full rounded-lg bg-slate-900 py-2.5 font-medium text-white hover:bg-slate-700"
+        >
+          Register
+        </button>
+      </form>
+
+      <p class="mt-6 text-center text-sm text-slate-600">
+        Already have an account?
+        <a routerLink="/login" class="font-medium text-slate-900 underline">Sign in</a>
+      </p>
+    }
+  </div>
+</main>
