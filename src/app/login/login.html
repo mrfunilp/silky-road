@@ -1,73 +1,61 @@
 <main class="min-h-dvh flex items-center justify-center bg-slate-100 px-4">
   <div class="w-full max-w-sm rounded-2xl bg-white p-8 shadow-lg">
-    @if (loggedInUser(); as user) {
-      <h1 class="text-2xl font-semibold text-slate-900">Welcome, {{ user }}!</h1>
-      <p class="mt-2 text-sm text-slate-600">You are logged in.</p>
-      <button
-        type="button"
-        (click)="logout()"
-        class="mt-6 w-full rounded-lg bg-slate-900 py-2.5 font-medium text-white hover:bg-slate-700"
-      >
-        Log out
-      </button>
-    } @else {
-      <h1 class="text-2xl font-semibold text-slate-900">Sign in</h1>
-      <p class="mt-1 text-sm text-slate-500">Test login: <code>admin</code> / <code>admin123</code></p>
+    <h1 class="text-2xl font-semibold text-slate-900">Sign in</h1>
+    <p class="mt-1 text-sm text-slate-500">Test login: <code>admin</code> / <code>admin123</code></p>
 
-      <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4" novalidate>
-        <div>
-          <label for="username" class="block text-sm font-medium text-slate-700">Username</label>
-          <input
-            id="username"
-            type="text"
-            formControlName="username"
-            autocomplete="username"
-            class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-          />
-          @if (form.controls.username.touched && form.controls.username.invalid) {
-            <p class="mt-1 text-xs text-red-600">Username is required.</p>
-          }
-        </div>
-
-        <div>
-          <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
-          <div class="relative mt-1">
-            <input
-              id="password"
-              [type]="showPassword() ? 'text' : 'password'"
-              formControlName="password"
-              autocomplete="current-password"
-              class="w-full rounded-lg border border-slate-300 px-3 py-2 pr-16 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
-            />
-            <button
-              type="button"
-              (click)="showPassword.set(!showPassword())"
-              class="absolute inset-y-0 right-0 px-3 text-xs text-slate-500 hover:text-slate-900"
-            >
-              {{ showPassword() ? 'Hide' : 'Show' }}
-            </button>
-          </div>
-          @if (form.controls.password.touched && form.controls.password.invalid) {
-            <p class="mt-1 text-xs text-red-600">Password is required.</p>
-          }
-        </div>
-
-        @if (error()) {
-          <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ error() }}</p>
+    <form [formGroup]="form" (ngSubmit)="submit()" class="mt-6 space-y-4" novalidate>
+      <div>
+        <label for="username" class="block text-sm font-medium text-slate-700">Username</label>
+        <input
+          id="username"
+          type="text"
+          formControlName="username"
+          autocomplete="username"
+          class="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+        />
+        @if (form.controls.username.touched && form.controls.username.invalid) {
+          <p class="mt-1 text-xs text-red-600">Username is required.</p>
         }
+      </div>
 
-        <button
-          type="submit"
-          class="w-full rounded-lg bg-slate-900 py-2.5 font-medium text-white hover:bg-slate-700"
-        >
-          Sign in
-        </button>
-      </form>
+      <div>
+        <label for="password" class="block text-sm font-medium text-slate-700">Password</label>
+        <div class="relative mt-1">
+          <input
+            id="password"
+            [type]="showPassword() ? 'text' : 'password'"
+            formControlName="password"
+            autocomplete="current-password"
+            class="w-full rounded-lg border border-slate-300 px-3 py-2 pr-16 outline-none focus:border-slate-900 focus:ring-1 focus:ring-slate-900"
+          />
+          <button
+            type="button"
+            (click)="showPassword.set(!showPassword())"
+            class="absolute inset-y-0 right-0 px-3 text-xs text-slate-500 hover:text-slate-900"
+          >
+            {{ showPassword() ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+        @if (form.controls.password.touched && form.controls.password.invalid) {
+          <p class="mt-1 text-xs text-red-600">Password is required.</p>
+        }
+      </div>
 
-      <p class="mt-6 text-center text-sm text-slate-600">
-        No account yet?
-        <a routerLink="/register" class="font-medium text-slate-900 underline">Register</a>
-      </p>
-    }
+      @if (error()) {
+        <p class="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-700">{{ error() }}</p>
+      }
+
+      <button
+        type="submit"
+        class="w-full rounded-lg bg-slate-900 py-2.5 font-medium text-white hover:bg-slate-700"
+      >
+        Sign in
+      </button>
+    </form>
+
+    <p class="mt-6 text-center text-sm text-slate-600">
+      No account yet?
+      <a routerLink="/register" class="font-medium text-slate-900 underline">Register</a>
+    </p>
   </div>
 </main>

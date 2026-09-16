@@ -1,6 +1,6 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
 
 @Component({
@@ -12,6 +12,7 @@ import { AuthService } from '../services/auth.service';
 export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   protected readonly form = this.fb.nonNullable.group({
     username: ['', Validators.required],
@@ -19,7 +20,6 @@ export class Login {
   });
 
   protected readonly error = signal('');
-  protected readonly loggedInUser = signal<string | null>(null);
   protected readonly showPassword = signal(false);
 
   protected submit(): void {
@@ -30,16 +30,10 @@ export class Login {
     }
 
     const { username, password } = this.form.getRawValue();
-    const user = this.authService.findByCredentials(username, password);
-    if (user) {
-      this.loggedInUser.set(user.username);
+    if (this.authService.login(username, password)) {
+      this.router.navigate(['/dashboard']);
     } else {
       this.error.set('Invalid username or password.');
     }
-  }
-
-  protected logout(): void {
-    this.loggedInUser.set(null);
-    this.form.reset();
   }
 }

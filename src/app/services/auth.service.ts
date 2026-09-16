@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { Injectable, computed, signal } from '@angular/core';
 import { User } from '../models/user';
 
 export type RegisterResult = { ok: true } | { ok: false; error: string };
@@ -33,7 +33,25 @@ export class AuthService {
     return { ok: true };
   }
 
+  // The logged-in user, or null if nobody is logged in.
+  private readonly _currentUser = signal<User | null>(null);
+  readonly currentUser = this._currentUser.asReadonly();
+  readonly isAuthenticated = computed(() => this._currentUser() !== null);
+
   findByCredentials(username: string, password: string): User | undefined {
     return this._users().find((u) => u.username === username && u.password === password);
+  }
+
+  /** Logs the user in if the credentials match. Returns whether it worked. */
+  login(username: string, password: string): boolean {
+    const user = this.findByCredentials(username, password);
+    if (user) {
+      this._currentUser.set(user);
+    }
+    return !!user;
+  }
+
+  logout(): void {
+    this._currentUser.set(null);
   }
 }
