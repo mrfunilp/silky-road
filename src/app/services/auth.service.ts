@@ -1,11 +1,13 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, inject, signal } from '@angular/core';
 import { User } from '../models/user';
+import { Router } from '@angular/router';
 
 export type RegisterResult = { ok: true } | { ok: false; error: string };
 
 /** Handles login and registration. Uses in-memory users for now; will call the Spring API later. */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly router = inject(Router);
   // Hardcoded test user.
   private readonly _users = signal<User[]>([
     {
@@ -53,5 +55,6 @@ export class AuthService {
 
   logout(): void {
     this._currentUser.set(null);
+    this.router.navigate(['/login']);
   }
 }

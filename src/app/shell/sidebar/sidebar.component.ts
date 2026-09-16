@@ -12,4 +12,7 @@ export class SidebarComponent {
 
 
   private readonly authService = inject(AuthService);
+  logout() {
+    this.authService.logout();
+  }
 }
