@@ -1,12 +1,17 @@
-<aside class="flex h-dvh w-64 flex-col bg-slate-900 text-slate-100">
-  <nav class="flex-1 space-y-1 px-3 py-4">
+<aside class="xp-sidebar">
+  <div class="xp-sidebar-header">SilkyRoad</div>
+
+  <nav class="flex-1 py-2">
     <a
       routerLink="/dashboard"
-      routerLinkActive="bg-slate-800 text-white"
-      class="block rounded-lg px-3 py-2 text-sm text-slate-300 hover:bg-slate-800 hover:text-white"
+      routerLinkActive="xp-sidebar-link-active"
+      class="xp-sidebar-link"
     >
       Dashboard
     </a>
-    <button class="bg-red-500 text-white px-4 py-2 rounded-md" type="button" (click)="logout()">Logout</button>
   </nav>
+
+  <div class="border-t border-t-[#c3cfe0] p-2 shadow-[inset_0_1px_0_rgba(255,255,255,0.7)]">
+    <button type="button" class="xp-button w-full" (click)="logout()">Log Off</button>
+  </div>
 </aside>

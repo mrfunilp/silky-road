@@ -1,10 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { MarketplaceItem } from '../models/marketplace-item';
-import { NgFor, NgIf } from '@angular/common';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgFor, NgIf],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.css',
 })

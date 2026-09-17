@@ -1,9 +1,23 @@
-<h1 class="p-6 text-2xl font-semibold text-slate-900">Dashboard</h1>
-<button class="bg-red-500 text-white px-4 py-2 rounded-md" type="button" (click)="addItem()">Add Item</button>
-<div class="m-6 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-    @for (item of items(); track item.id){
-    <div class="border rounded-lg p-4">
-        <p>{{item.name}}</p>
-    </div>
+<div class="p-4">
+  <div class="mb-3 flex items-center justify-between">
+    <h1 class="text-base font-bold text-xp-blue">Dashboard</h1>
+    <button class="xp-button" type="button" (click)="addItem()">Add Item</button>
+  </div>
+
+  <div class="xp-groupbox">
+    <p class="xp-legend mb-2">My Items ({{ items().length }})</p>
+
+    @if (items().length === 0) {
+      <p class="text-sm text-[#555]">This folder is empty.</p>
+    } @else {
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        @for (item of items(); track item.id) {
+          <div class="xp-window p-2">
+            <p class="text-sm font-bold">{{ item.name || '(untitled item)' }}</p>
+            <p class="text-xs text-[#555]">{{ item.status }}</p>
+          </div>
+        }
+      </div>
     }
+  </div>
 </div>
