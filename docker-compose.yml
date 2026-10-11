@@ -22,6 +22,9 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    read_only: true
+    tmpfs: 
+      - /tmp:rw
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/silkyroad
       SPRING_DATASOURCE_USERNAME: silkyroad
@@ -32,9 +35,13 @@ services:
       - "8080:8080"
 
   frontend:
+
     build: .
     depends_on:
       - backend
+    read_only: true
+    tmpfs: 
+      - /tmp:rw
     ports:
       - "8081:8080"
 
