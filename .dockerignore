@@ -1,0 +1,10 @@
+node_modules/
+dist/
+.angular/
+backend/
+.git/
+.vscode/
+.claude/
+.idea/
+README.md
+CLAUDE.md

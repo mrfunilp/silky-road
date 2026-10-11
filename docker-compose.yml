@@ -1,0 +1,42 @@
+name: silkyroad
+
+services:
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_DB: silkyroad
+      POSTGRES_USER: silkyroad
+      POSTGRES_PASSWORD: silkyroad
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U silkyroad -d silkyroad"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/silkyroad
+      SPRING_DATASOURCE_USERNAME: silkyroad
+      SPRING_DATASOURCE_PASSWORD: silkyroad
+      SPRING_H2_CONSOLE_ENABLED: "false"
+      SILKYROAD_CORS_ALLOWED_ORIGINS: http://localhost:4200,http://localhost:8081
+    ports:
+      - "8080:8080"
+
+  frontend:
+    build: .
+    depends_on:
+      - backend
+    ports:
+      - "8081:8080"
+
+volumes:
+  db-data:

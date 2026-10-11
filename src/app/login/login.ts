@@ -2,6 +2,7 @@ import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { apiErrorMessage } from '../core/api-error';
 
 @Component({
   selector: 'app-login',
@@ -21,6 +22,7 @@ export class Login {
 
   protected readonly error = signal('');
   protected readonly showPassword = signal(false);
+  protected readonly submitting = signal(false);
 
   protected submit(): void {
     this.error.set('');
@@ -30,10 +32,17 @@ export class Login {
     }
 
     const { username, password } = this.form.getRawValue();
-    if (this.authService.login(username, password)) {
-      this.router.navigate(['/dashboard']);
-    } else {
-      this.error.set('Invalid username or password.');
-    }
+    this.submitting.set(true);
+
+    this.authService.login(username, password).subscribe({
+      next: () => {
+        this.submitting.set(false);
+        this.router.navigate(['/dashboard']);
+      },
+      error: (error: unknown) => {
+        this.submitting.set(false);
+        this.error.set(apiErrorMessage(error, 'Invalid username or password.'));
+      },
+    });
   }
 }

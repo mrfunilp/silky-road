@@ -1,18 +1,14 @@
-/* Global styles. Look and feel: Windows XP / early-2000s, grays with a subtle blue accent. */
-
 @import 'tailwindcss';
 
 @theme {
   --font-sans: Tahoma, 'Trebuchet MS', Verdana, Geneva, sans-serif;
 
-  /* Dialog face and the classic 3D bevel grays. */
   --color-face: #ece9d8;
   --color-face-dark: #d4d0c8;
   --color-bevel-light: #ffffff;
   --color-bevel-mid: #aca899;
   --color-bevel-dark: #716f64;
 
-  /* The one accent colour: XP window-chrome blue. */
   --color-xp-blue: #0a246a;
   --color-xp-blue-light: #3d7bd4;
   --color-xp-blue-pale: #d6e5f5;
@@ -30,12 +26,10 @@
 }
 
 @layer components {
-  /* A full-screen muted-blue "desktop" to centre dialogs on. */
   .xp-desktop {
     @apply flex min-h-dvh items-center justify-center bg-desktop px-4 py-8;
   }
 
-  /* Raised panel with the classic double bevel. */
   .xp-window {
     @apply border-2 bg-face;
     border-color: var(--color-bevel-light) var(--color-bevel-dark) var(--color-bevel-dark)
@@ -46,7 +40,6 @@
       2px 2px 6px rgb(0 0 0 / 0.35);
   }
 
-  /* Blue gradient title bar. */
   .xp-titlebar {
     @apply flex items-center px-2 py-1 text-sm font-bold text-white;
     background: linear-gradient(
@@ -62,7 +55,6 @@
     @apply p-4;
   }
 
-  /* Grouping box with an etched border, as used inside XP property sheets. */
   .xp-groupbox {
     @apply border p-3;
     border-color: var(--color-bevel-mid);
@@ -73,7 +65,6 @@
     @apply px-1 text-sm font-bold text-xp-blue;
   }
 
-  /* Raised push button; presses in on click. */
   .xp-button {
     @apply cursor-pointer border-2 bg-face px-4 py-1 text-sm text-black;
     border-color: var(--color-bevel-light) var(--color-bevel-dark) var(--color-bevel-dark)
@@ -98,7 +89,6 @@
     @apply outline-1 outline-offset-[-4px] outline-dotted outline-black;
   }
 
-  /* The dialog's default action, e.g. Sign in / Register. */
   .xp-button-default {
     @apply font-bold;
     box-shadow:
@@ -107,7 +97,6 @@
       0 0 0 1px var(--color-xp-blue);
   }
 
-  /* Sunken text field. */
   .xp-input {
     @apply w-full border-2 bg-white px-2 py-1 text-sm text-black outline-none;
     border-color: var(--color-bevel-dark) var(--color-bevel-light) var(--color-bevel-light)
@@ -122,12 +111,10 @@
     @apply block text-sm text-black;
   }
 
-  /* Validation text. Kept dark red rather than a bright modern red. */
   .xp-error-text {
     @apply mt-1 text-xs text-[#8b0000];
   }
 
-  /* Message box strip for form-level errors. */
   .xp-error-box {
     @apply border px-2 py-1 text-sm text-[#8b0000];
     border-color: var(--color-bevel-mid);
@@ -142,27 +129,21 @@
     @apply text-[#cc6600];
   }
 
-  /* Shell layout: task pane pinned to the viewport, content pane scrolls past it. */
   .xp-shell {
     @apply flex min-h-dvh bg-face;
   }
 
-  /* Explorer-style task pane on the left of the shell. */
   .xp-sidebar {
     @apply sticky top-0 flex h-dvh w-52 shrink-0 flex-col text-sm;
-    /* Second layer is the pane colour; the first cools its right edge so it
-       meets the content pane instead of stopping dead against it. */
     background:
       linear-gradient(to right, transparent 55%, rgb(255 255 255 / 0.65) 100%),
       linear-gradient(to bottom, #eef3fb 0%, #e2eaf6 55%, #dae3f1 100%);
-    /* Groove instead of a flat border: inner highlight, 1px seam, soft falloff. */
     box-shadow:
       inset -1px 0 0 rgb(255 255 255 / 0.75),
       1px 0 0 #b9c4d6,
       4px 0 8px -4px rgb(10 36 106 / 0.16);
   }
 
-  /* Content pane. Light and neutral so the task pane can fade into it. */
   .xp-content {
     @apply min-w-0 flex-1 bg-white;
     box-shadow: inset 8px 0 10px -10px rgb(10 36 106 / 0.22);

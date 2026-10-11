@@ -6,10 +6,8 @@ import { ShellComponent } from './shell/shell.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 
 export const routes: Routes = [
-  //public pages
   { path: 'login', component: Login },
   { path: 'register', component: Registration },
-  //protected routes
   {
     path: '',
     component: ShellComponent,
@@ -19,6 +17,5 @@ export const routes: Routes = [
       { path: 'dashboard', component: DashboardComponent },
     ],
   },
-  //unknown urls
   { path: '**', redirectTo: '' },
 ];

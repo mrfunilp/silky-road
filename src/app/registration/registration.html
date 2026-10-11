@@ -76,7 +76,9 @@
           }
 
           <div class="flex justify-end gap-2 pt-1">
-            <button type="submit" class="xp-button xp-button-default">Register</button>
+            <button type="submit" class="xp-button xp-button-default" [disabled]="submitting()">
+              {{ submitting() ? 'Creating...' : 'Register' }}
+            </button>
           </div>
         </form>
 

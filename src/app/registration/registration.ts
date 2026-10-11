@@ -8,6 +8,7 @@ import {
 } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { apiErrorMessage } from '../core/api-error';
 
 function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   const password = group.get('password')?.value;
@@ -37,6 +38,7 @@ export class Registration {
 
   protected readonly error = signal('');
   protected readonly registeredUser = signal<string | null>(null);
+  protected readonly submitting = signal(false);
 
   protected submit(): void {
     this.error.set('');
@@ -46,12 +48,18 @@ export class Registration {
     }
 
     const { username, email, password } = this.form.getRawValue();
-    const result = this.authService.register(username.trim(), email.trim(), password);
-    if (result.ok) {
-      this.registeredUser.set(username.trim());
-      this.form.reset();
-    } else {
-      this.error.set(result.error);
-    }
+    this.submitting.set(true);
+
+    this.authService.register(username.trim(), email.trim(), password).subscribe({
+      next: (user) => {
+        this.submitting.set(false);
+        this.registeredUser.set(user.username);
+        this.form.reset();
+      },
+      error: (error: unknown) => {
+        this.submitting.set(false);
+        this.error.set(apiErrorMessage(error, 'Could not create the account.'));
+      },
+    });
   }
 }

@@ -1,60 +1,91 @@
-import { Injectable, computed, inject, signal } from '@angular/core';
-import { User } from '../models/user';
+import { Injectable, PLATFORM_ID, computed, inject, signal } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { Observable, tap } from 'rxjs';
+import { API_BASE_URL } from '../core/api.config';
+import { AuthResponse, User } from '../models/user';
 
-export type RegisterResult = { ok: true } | { ok: false; error: string };
+const STORAGE_KEY = 'silkyroad.session';
 
-/** Handles login and registration. Uses in-memory users for now; will call the Spring API later. */
+interface Session {
+  token: string;
+  expiresAt: number;
+  user: User;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly http = inject(HttpClient);
   private readonly router = inject(Router);
-  // Hardcoded test user.
-  private readonly _users = signal<User[]>([
-    {
-      id: crypto.randomUUID(),
-      username: 'admin',
-      email: 'admin@example.com',
-      password: 'admin123',
-      createdAt: new Date(),
-    },
-  ]);
 
-  readonly users = this._users.asReadonly();
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
-  register(username: string, email: string, password: string): RegisterResult {
-    const users = this._users();
-    if (users.some((u) => u.username.toLowerCase() === username.toLowerCase())) {
-      return { ok: false, error: 'That username is already taken.' };
-    }
-    if (users.some((u) => u.email.toLowerCase() === email.toLowerCase())) {
-      return { ok: false, error: 'An account with that email already exists.' };
-    }
+  private readonly _session = signal<Session | null>(this.restore());
 
-    const user: User = { id: crypto.randomUUID(), username, email, password, createdAt: new Date() };
-    this._users.update((list) => [...list, user]);
-    return { ok: true };
+  readonly currentUser = computed<User | null>(() => this._session()?.user ?? null);
+  readonly isAuthenticated = computed(() => this._session() !== null);
+
+  get token(): string | null {
+    return this._session()?.token ?? null;
   }
 
-  // The logged-in user, or null if nobody is logged in.
-  private readonly _currentUser = signal<User | null>(null);
-  readonly currentUser = this._currentUser.asReadonly();
-  readonly isAuthenticated = computed(() => this._currentUser() !== null);
-
-  findByCredentials(username: string, password: string): User | undefined {
-    return this._users().find((u) => u.username === username && u.password === password);
+  register(username: string, email: string, password: string): Observable<User> {
+    return this.http.post<User>(`${API_BASE_URL}/users`, { username, email, password });
   }
 
-  /** Logs the user in if the credentials match. Returns whether it worked. */
-  login(username: string, password: string): boolean {
-    const user = this.findByCredentials(username, password);
-    if (user) {
-      this._currentUser.set(user);
-    }
-    return !!user;
+  login(username: string, password: string): Observable<AuthResponse> {
+    return this.http
+      .post<AuthResponse>(`${API_BASE_URL}/users/login`, { username, password })
+      .pipe(
+        tap((response) =>
+          this.persist({
+            token: response.token,
+            expiresAt: Date.now() + response.expiresIn * 1000,
+            user: response.user,
+          }),
+        ),
+      );
   }
 
   logout(): void {
-    this._currentUser.set(null);
+    this._session.set(null);
+    if (this.isBrowser) {
+      try {
+        localStorage.removeItem(STORAGE_KEY);
+      } catch {
+      }
+    }
     this.router.navigate(['/login']);
+  }
+
+  private persist(session: Session): void {
+    this._session.set(session);
+    if (this.isBrowser) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(session));
+      } catch {
+      }
+    }
+  }
+
+  private restore(): Session | null {
+    if (!this.isBrowser) {
+      return null;
+    }
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) {
+        return null;
+      }
+      const session = JSON.parse(raw) as Session;
+      if (!session?.token || !session.user || session.expiresAt <= Date.now()) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+      return session;
+    } catch {
+      return null;
+    }
   }
 }
