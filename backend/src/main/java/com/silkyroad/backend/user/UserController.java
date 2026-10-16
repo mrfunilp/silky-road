@@ -3,10 +3,11 @@ package com.silkyroad.backend.user;
 import com.silkyroad.backend.user.dto.AuthResponse;
 import com.silkyroad.backend.user.dto.CreateUserRequest;
 import com.silkyroad.backend.user.dto.LoginRequest;
+import com.silkyroad.backend.user.dto.UpdateAccountRequest;
+import com.silkyroad.backend.user.dto.UserProfileResponse;
 import com.silkyroad.backend.user.dto.UserResponse;
 import jakarta.validation.Valid;
 import java.net.URI;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -28,19 +30,14 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping("/me")
-    public UserResponse me(@AuthenticationPrincipal Jwt jwt) {
-        return userService.findById(UUID.fromString(jwt.getSubject()));
-    }
-
-    @GetMapping
-    public List<UserResponse> findAll() {
-        return userService.findAll();
+    @PutMapping("/me")
+    public UserResponse updateMe(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UpdateAccountRequest request) {
+        return userService.updateAccount(UUID.fromString(jwt.getSubject()), request);
     }
 
     @GetMapping("/{id}")
-    public UserResponse findById(@PathVariable UUID id) {
-        return userService.findById(id);
+    public UserProfileResponse findById(@PathVariable UUID id) {
+        return userService.findProfile(id);
     }
 
     @PostMapping

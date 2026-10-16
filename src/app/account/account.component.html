@@ -1,0 +1,108 @@
+<div class="xp-page">
+  <h1 class="mx-auto w-full max-w-5xl text-base font-bold text-xp-blue">My Account</h1>
+
+  <form
+    [formGroup]="form"
+    (ngSubmit)="submit()"
+    class="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-3"
+    novalidate
+  >
+    <div class="grid grid-cols-1 gap-3 lg:grid-cols-2">
+      <div class="xp-groupbox space-y-3">
+        <p class="xp-legend">Account Information</p>
+
+        <div>
+          <label for="username" class="xp-label">User name:</label>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            autocomplete="username"
+            class="xp-input mt-1"
+          />
+          @if (form.controls.username.touched && form.controls.username.invalid) {
+            <p class="xp-error-text">Username must be 3–20 characters.</p>
+          }
+        </div>
+
+        <div>
+          <label for="email" class="xp-label">E-mail:</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            autocomplete="email"
+            class="xp-input mt-1"
+          />
+          @if (form.controls.email.touched && form.controls.email.invalid) {
+            <p class="xp-error-text">Enter a valid email address.</p>
+          }
+        </div>
+      </div>
+
+      <div class="xp-groupbox space-y-3">
+        <p class="xp-legend">Change Password</p>
+
+        <div>
+          <label for="newPassword" class="xp-label">New password (leave empty to keep):</label>
+          <input
+            id="newPassword"
+            type="password"
+            formControlName="newPassword"
+            autocomplete="new-password"
+            class="xp-input mt-1"
+          />
+          @if (form.controls.newPassword.touched && form.controls.newPassword.invalid) {
+            <p class="xp-error-text">Password must be at least 8 characters.</p>
+          }
+        </div>
+
+        <div>
+          <label for="confirmPassword" class="xp-label">Confirm new password:</label>
+          <input
+            id="confirmPassword"
+            type="password"
+            formControlName="confirmPassword"
+            autocomplete="new-password"
+            class="xp-input mt-1"
+          />
+          @if (form.controls.confirmPassword.touched && form.hasError('passwordMismatch')) {
+            <p class="xp-error-text">Passwords do not match.</p>
+          }
+        </div>
+      </div>
+    </div>
+
+    <div class="xp-groupbox space-y-3">
+      <p class="xp-legend">Confirm Changes</p>
+
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-end">
+        <div class="flex-1">
+          <label for="currentPassword" class="xp-label">Current password (required to save):</label>
+          <input
+            id="currentPassword"
+            type="password"
+            formControlName="currentPassword"
+            autocomplete="current-password"
+            class="xp-input mt-1"
+          />
+        </div>
+        <button type="submit" class="xp-button xp-button-default shrink-0" [disabled]="saving()">
+          {{ saving() ? 'Saving...' : 'Save Changes' }}
+        </button>
+      </div>
+      @if (form.controls.currentPassword.touched && form.controls.currentPassword.invalid) {
+        <p class="xp-error-text">Enter your current password to confirm the changes.</p>
+      }
+
+      @if (error()) {
+        <p class="xp-error-box">{{ error() }}</p>
+      }
+      @if (success()) {
+        <p class="border border-bevel-mid bg-xp-blue-pale px-2 py-1 text-sm text-xp-blue">
+          {{ success() }}
+        </p>
+      }
+    </div>
+  </form>
+</div>

@@ -1,0 +1,161 @@
+<div class="xp-page">
+  <div>
+    <a routerLink="/dashboard" class="xp-link text-sm">&laquo; Back to Dashboard</a>
+  </div>
+
+  @if (error()) {
+    <p class="xp-error-box">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-[#555]">Loading...</p>
+  } @else if (item(); as item) {
+    <div class="flex flex-1 flex-col gap-3 xl:flex-row">
+      <div class="xp-window flex flex-col xl:flex-1">
+        <div class="xp-titlebar justify-between gap-2">
+          <span>{{ item.name || '(untitled item)' }}</span>
+          @if (ownedByMe()) {
+            <span class="text-xs font-normal">Yours</span>
+          }
+        </div>
+
+        <div class="xp-body flex flex-1 flex-col gap-4 lg:flex-row">
+          <div class="lg:w-3/5">
+            @if (item.imageUrls.length > 0) {
+              <img
+                [src]="item.imageUrls[selected()]"
+                [alt]="item.name"
+                class="h-[min(60dvh,40rem)] w-full border border-bevel-mid bg-white object-contain"
+              />
+
+              @if (item.imageUrls.length > 1) {
+                <div class="mt-2 flex gap-2">
+                  @for (url of item.imageUrls; track url; let i = $index) {
+                    <button
+                      type="button"
+                      class="cursor-pointer border-2 p-0"
+                      [class.border-xp-blue-light]="i === selected()"
+                      [class.border-transparent]="i !== selected()"
+                      (click)="selected.set(i)"
+                    >
+                      <img [src]="url" alt="" class="h-16 w-16 object-cover" />
+                    </button>
+                  }
+                </div>
+              }
+            } @else {
+              <div
+                class="flex h-[min(60dvh,40rem)] w-full items-center justify-center border border-bevel-mid bg-face-dark text-sm text-[#555]"
+              >
+                No picture
+              </div>
+            }
+          </div>
+
+          <div class="space-y-2 text-sm lg:w-2/5">
+            <p class="text-base font-bold">{{ item.price }} {{ item.currency }}</p>
+
+            <div class="xp-groupbox space-y-1">
+              <p><span class="text-[#555]">Status:</span> {{ item.status }}</p>
+              @if (item.category) {
+                <p><span class="text-[#555]">Category:</span> {{ item.category }}</p>
+              }
+              <p>
+                <span class="text-[#555]">Seller:</span>
+                <a [routerLink]="['/users', item.creator.id]" class="xp-link ml-1">{{
+                  item.creator.username
+                }}</a>
+              </p>
+              <p><span class="text-[#555]">Listed:</span> {{ item.createdAt.substring(0, 10) }}</p>
+            </div>
+
+            @if (item.biography) {
+              <div class="xp-groupbox">
+                <p class="xp-legend mb-1">Description</p>
+                <p class="whitespace-pre-line">{{ item.biography }}</p>
+              </div>
+            }
+
+            @if (ownedByMe()) {
+              <a routerLink="/my-items" class="xp-button inline-block no-underline"
+                >Edit in Your Items</a
+              >
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="xp-groupbox flex flex-col xl:w-[26rem] xl:shrink-0">
+        <p class="xp-legend mb-2">
+          {{ ownedByMe() ? 'Interested Buyers' : 'Comments' }} ({{ comments().length }})
+        </p>
+
+        @if (commentError()) {
+          <p class="xp-error-box mb-2">{{ commentError() }}</p>
+        }
+
+        @if (comments().length === 0) {
+          <p class="text-sm text-[#555]">
+            {{
+              ownedByMe()
+                ? 'Nobody has shown interest yet.'
+                : 'No comments yet. Be the first to show interest!'
+            }}
+          </p>
+        } @else {
+          <div class="space-y-2">
+            @for (comment of comments(); track comment.id) {
+              <div class="xp-window p-2">
+                <div class="flex items-start justify-between gap-2">
+                  <p class="text-xs text-[#555]">
+                    <a [routerLink]="['/users', comment.author.id]" class="xp-link font-bold">{{
+                      comment.author.username
+                    }}</a>
+                    &middot; {{ comment.createdAt.substring(0, 10) }}
+                  </p>
+                  @if (isMine(comment)) {
+                    <button
+                      type="button"
+                      class="xp-button px-2 text-xs"
+                      (click)="removeComment(comment)"
+                    >
+                      Delete
+                    </button>
+                  }
+                </div>
+                <p class="mt-1 whitespace-pre-line break-words text-sm">{{ comment.text }}</p>
+              </div>
+            }
+          </div>
+        }
+
+        @if (!ownedByMe()) {
+          <form
+            [formGroup]="commentForm"
+            (ngSubmit)="postComment()"
+            class="mt-auto space-y-2 pt-3"
+            novalidate
+          >
+            <label for="comment" class="xp-label">Show your interest:</label>
+            <textarea
+              id="comment"
+              rows="3"
+              maxlength="500"
+              formControlName="text"
+              class="xp-input"
+              placeholder="e.g. Is this still available?"
+            ></textarea>
+            @if (commentForm.controls.text.touched && commentForm.controls.text.invalid) {
+              <p class="xp-error-text">Write a comment of up to 500 characters.</p>
+            }
+            <div class="flex justify-end">
+              <button type="submit" class="xp-button xp-button-default" [disabled]="posting()">
+                {{ posting() ? 'Posting...' : 'Post Comment' }}
+              </button>
+            </div>
+          </form>
+        }
+      </div>
+    </div>
+  }
+</div>

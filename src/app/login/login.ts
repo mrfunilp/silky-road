@@ -8,7 +8,6 @@ import { apiErrorMessage } from '../core/api-error';
   selector: 'app-login',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './login.html',
-  styleUrl: './login.css',
 })
 export class Login {
   private readonly fb = inject(FormBuilder);

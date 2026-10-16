@@ -1,7 +1,8 @@
 # SilkyRoad backend
 
 Spring Boot 4.1.1 REST API for the Angular app in the parent directory.
-Stateless JWT auth, Postgres in Docker, H2 everywhere else.
+Stateless JWT auth, Postgres in Docker. The application always runs against
+Postgres; H2 is a test-only dependency used to boot the context during tests.
 
 ## Run with Docker (recommended)
 
@@ -20,24 +21,25 @@ it, add `-v`.
 
 ## Run without Docker
 
-Needs a JDK 21 or newer. Maven is **not** required - `mvnw` downloads it.
+Needs a JDK 21 or newer and a reachable Postgres. Maven is **not** required -
+`mvnw` downloads it. The easiest Postgres is the Compose one: `docker compose up
+db` from the repository root.
 
 ```bash
 cd backend
-./mvnw spring-boot:run        # PowerShell: .\mvnw.cmd spring-boot:run
+SPRING_DATASOURCE_URL=jdbc:postgresql://localhost:5432/silkyroad \
+SPRING_DATASOURCE_USERNAME=silkyroad \
+SPRING_DATASOURCE_PASSWORD=silkyroad \
+./mvnw spring-boot:run        # PowerShell: set the vars with $env:NAME first
 ```
 
-This uses an in-memory H2 database instead of Postgres, rebuilt on every start.
-Browse it at <http://localhost:8080/h2-console> with JDBC URL
-`jdbc:h2:mem:silkyroad`, user `sa`, no password.
-
-Either way the database is seeded with one account: `admin` / `admin123`.
+The database is seeded with one account: `admin` / `admin123`.
 
 ## Database configuration
 
-`application.properties` defaults to H2. Compose overrides it with
-`SPRING_DATASOURCE_*` environment variables pointing at Postgres, so the same
-jar runs against either and there are no Spring profiles to juggle.
+The application has no datasource defaults and always expects Postgres through
+the `SPRING_DATASOURCE_*` environment variables (Compose sets them). There are
+no Spring profiles to juggle.
 
 ## Test
 
@@ -45,7 +47,9 @@ jar runs against either and there are no Spring profiles to juggle.
 ./mvnw test
 ```
 
-Tests run against H2, so they need no running database.
+Tests boot the full context against an in-memory H2 database, auto-configured
+from the test-scoped H2 dependency, so they need no running database. H2 is not
+part of the shipped application.
 
 ## Endpoints
 

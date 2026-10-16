@@ -40,12 +40,6 @@ public class MarketplaceItem {
     @JoinColumn(name = "creator_id", nullable = false)
     private User creator;
 
-    @Column(nullable = false)
-    private long likes;
-
-    @Column(nullable = false)
-    private long views;
-
     @Column(nullable = false, precision = 12, scale = 2)
     private BigDecimal price;
 
@@ -54,11 +48,6 @@ public class MarketplaceItem {
 
     @Column(length = 60)
     private String category;
-
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(name = "marketplace_item_tags", joinColumns = @JoinColumn(name = "item_id"))
-    @Column(name = "tag", length = 40)
-    private List<String> tags = new ArrayList<>();
 
     @ElementCollection(fetch = FetchType.EAGER)
     @CollectionTable(name = "marketplace_item_images", joinColumns = @JoinColumn(name = "item_id"))
@@ -123,14 +112,6 @@ public class MarketplaceItem {
         return creator;
     }
 
-    public long getLikes() {
-        return likes;
-    }
-
-    public long getViews() {
-        return views;
-    }
-
     public BigDecimal getPrice() {
         return price;
     }
@@ -153,14 +134,6 @@ public class MarketplaceItem {
 
     public void setCategory(String category) {
         this.category = category;
-    }
-
-    public List<String> getTags() {
-        return tags;
-    }
-
-    public void setTags(List<String> tags) {
-        this.tags = tags;
     }
 
     public List<String> getImageUrls() {

@@ -1,62 +1,31 @@
-<div class="p-4">
-  <div class="mb-3 flex items-center justify-between">
+<div class="xp-page">
+  <div class="flex items-center justify-between gap-2">
     <h1 class="text-base font-bold text-xp-blue">Dashboard</h1>
-    <button class="xp-button" type="button" (click)="load()" [disabled]="loading()">Refresh</button>
+    <div class="flex gap-2">
+      <a routerLink="/my-items" class="xp-button no-underline">Manage Your Items</a>
+      <button class="xp-button" type="button" (click)="load()" [disabled]="loading()">
+        Refresh
+      </button>
+    </div>
   </div>
 
   @if (error()) {
-    <p class="xp-error-box mb-3">{{ error() }}</p>
+    <p class="xp-error-box">{{ error() }}</p>
   }
 
-  <div class="xp-groupbox mb-3">
-    <p class="xp-legend mb-2">New Listing</p>
-
-    <form [formGroup]="form" (ngSubmit)="addItem()" class="flex flex-wrap items-end gap-2" novalidate>
-      <div>
-        <label for="name" class="xp-label">Name:</label>
-        <input id="name" type="text" formControlName="name" class="xp-input mt-1 w-48" />
-      </div>
-      <div>
-        <label for="price" class="xp-label">Price:</label>
-        <input id="price" type="number" step="0.01" min="0" formControlName="price" class="xp-input mt-1 w-24" />
-      </div>
-      <div>
-        <label for="currency" class="xp-label">Currency:</label>
-        <input id="currency" type="text" maxlength="3" formControlName="currency" class="xp-input mt-1 w-20" />
-      </div>
-      <button type="submit" class="xp-button xp-button-default" [disabled]="saving()">
-        {{ saving() ? 'Saving...' : 'Add Item' }}
-      </button>
-    </form>
-
-    @if (form.controls.name.touched && form.controls.name.invalid) {
-      <p class="xp-error-text">A name is required.</p>
-    }
-  </div>
-
-  <div class="xp-groupbox">
-    <p class="xp-legend mb-2">Listings ({{ items().length }})</p>
+  <div class="xp-groupbox flex-1">
+    <p class="xp-legend mb-2">All Listings ({{ items().length }})</p>
 
     @if (loading()) {
       <p class="text-sm text-[#555]">Loading...</p>
     } @else if (items().length === 0) {
       <p class="text-sm text-[#555]">This folder is empty.</p>
     } @else {
-      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="xp-card-grid">
         @for (item of items(); track item.id) {
-          <div class="xp-window p-2">
-            <p class="text-sm font-bold">{{ item.name || '(untitled item)' }}</p>
-            <p class="text-xs text-[#555]">
-              {{ item.price }} {{ item.currency }} &middot; {{ item.status }}
-            </p>
-            <p class="text-xs text-[#555]">by {{ item.creator.username }}</p>
-
-            @if (ownedByMe(item)) {
-              <button type="button" class="xp-button mt-2 text-xs" (click)="removeItem(item)">
-                Delete
-              </button>
-            }
-          </div>
+          <a [routerLink]="['/items', item.id]" class="group block text-black no-underline">
+            <app-item-card [item]="item" [badge]="ownedByMe(item) ? 'Yours' : null" />
+          </a>
         }
       </div>
     }

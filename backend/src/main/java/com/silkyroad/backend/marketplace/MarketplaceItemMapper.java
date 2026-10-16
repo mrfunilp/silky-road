@@ -5,8 +5,6 @@ import com.silkyroad.backend.marketplace.dto.MarketplaceItemResponse;
 import com.silkyroad.backend.marketplace.dto.UpdateMarketplaceItemRequest;
 import com.silkyroad.backend.user.User;
 import com.silkyroad.backend.user.UserMapper;
-import java.util.ArrayList;
-import java.util.List;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,16 +22,12 @@ public class MarketplaceItemMapper {
                 item.getName(),
                 item.getBiography(),
                 userMapper.toSummary(item.getCreator()),
-                item.getLikes(),
-                item.getViews(),
                 item.getPrice(),
                 item.getCurrency(),
                 item.getCategory(),
-                List.copyOf(item.getTags()),
-                List.copyOf(item.getImageUrls()),
+                item.getImageUrls().stream().map(name -> "/api/images/" + name).toList(),
                 item.getStatus().toValue(),
-                item.getCreatedAt(),
-                item.getUpdatedAt());
+                item.getCreatedAt());
     }
 
     public MarketplaceItem toEntity(CreateMarketplaceItemRequest request, User creator) {
@@ -41,8 +35,6 @@ public class MarketplaceItemMapper {
                 creator, request.name().trim(), request.price(), normaliseCurrency(request.currency()));
         item.setBiography(request.biography());
         item.setCategory(request.category());
-        item.setTags(copyOrEmpty(request.tags()));
-        item.setImageUrls(copyOrEmpty(request.imageUrls()));
         item.setStatus(MarketplaceItemStatus.fromValue(request.status()));
         return item;
     }
@@ -53,16 +45,10 @@ public class MarketplaceItemMapper {
         item.setPrice(request.price());
         item.setCurrency(normaliseCurrency(request.currency()));
         item.setCategory(request.category());
-        item.setTags(copyOrEmpty(request.tags()));
-        item.setImageUrls(copyOrEmpty(request.imageUrls()));
         item.setStatus(MarketplaceItemStatus.fromValue(request.status()));
     }
 
     private String normaliseCurrency(String currency) {
         return currency.trim().toUpperCase(java.util.Locale.ROOT);
-    }
-
-    private List<String> copyOrEmpty(List<String> values) {
-        return values == null ? new ArrayList<>() : new ArrayList<>(values);
     }
 }

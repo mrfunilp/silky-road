@@ -1,0 +1,54 @@
+<div class="xp-page">
+  <div>
+    <a routerLink="/dashboard" class="xp-link text-sm">&laquo; Back to Dashboard</a>
+  </div>
+
+  @if (error()) {
+    <p class="xp-error-box">{{ error() }}</p>
+  }
+
+  @if (loading()) {
+    <p class="text-sm text-[#555]">Loading...</p>
+  } @else if (profile(); as profile) {
+    <div class="xp-window">
+      <div class="xp-titlebar">User Profile</div>
+      <div class="xp-body flex flex-wrap items-center gap-4">
+        <div
+          class="flex h-16 w-16 shrink-0 items-center justify-center border border-bevel-mid bg-xp-blue-pale text-2xl font-bold text-xp-blue"
+        >
+          {{ profile.username.charAt(0).toUpperCase() }}
+        </div>
+        <div class="min-w-0 flex-1 text-sm">
+          <p class="text-base font-bold">{{ profile.username }}</p>
+          <p>
+            <span class="text-[#555]">Contact:</span>
+            <a [href]="'mailto:' + profile.email" class="xp-link">{{ profile.email }}</a>
+          </p>
+          <p>
+            <span class="text-[#555]">Member since:</span> {{ profile.createdAt.substring(0, 10) }}
+          </p>
+          <p><span class="text-[#555]">Listings:</span> {{ items().length }}</p>
+        </div>
+        @if (isMe()) {
+          <a routerLink="/account" class="xp-button no-underline">Edit My Account</a>
+        }
+      </div>
+    </div>
+
+    <div class="xp-groupbox flex-1">
+      <p class="xp-legend mb-2">Listings by {{ profile.username }} ({{ items().length }})</p>
+
+      @if (items().length === 0) {
+        <p class="text-sm text-[#555]">This user has no listings.</p>
+      } @else {
+        <div class="xp-card-grid">
+          @for (item of items(); track item.id) {
+            <a [routerLink]="['/items', item.id]" class="group block text-black no-underline">
+              <app-item-card [item]="item" [showCreator]="false" />
+            </a>
+          }
+        </div>
+      }
+    </div>
+  }
+</div>

@@ -1,0 +1,38 @@
+<div class="xp-window flex h-full gap-2 p-2 group-hover:bg-face-dark">
+  @if (item().imageUrls.length > 0) {
+    <img
+      [src]="item().imageUrls[0]"
+      alt=""
+      class="h-20 w-20 shrink-0 border border-bevel-mid object-cover"
+    />
+  } @else {
+    <div
+      class="flex h-20 w-20 shrink-0 items-center justify-center border border-bevel-mid bg-face-dark text-center text-xs text-[#555]"
+    >
+      No picture
+    </div>
+  }
+
+  <div class="flex min-w-0 flex-1 flex-col">
+    <div class="flex items-start justify-between gap-2">
+      <p class="truncate text-sm font-bold">{{ item().name || '(untitled item)' }}</p>
+      @if (badge()) {
+        <span class="shrink-0 border border-bevel-mid bg-xp-blue-pale px-1 text-xs text-xp-blue">
+          {{ badge() }}
+        </span>
+      }
+    </div>
+    <p class="text-xs text-[#555]">
+      {{ item().price }} {{ item().currency }} &middot; {{ item().status }}
+      @if (item().category) {
+        &middot; {{ item().category }}
+      }
+    </p>
+    @if (showCreator()) {
+      <p class="mt-1 text-xs text-[#555]">by {{ item().creator.username }}</p>
+    }
+    <div class="mt-auto">
+      <ng-content />
+    </div>
+  </div>
+</div>

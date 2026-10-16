@@ -4,7 +4,7 @@ import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { Observable, tap } from 'rxjs';
 import { API_BASE_URL } from '../core/api.config';
-import { AuthResponse, User } from '../models/user';
+import { AuthResponse, UpdateAccount, User } from '../models/user';
 
 const STORAGE_KEY = 'silkyroad.session';
 
@@ -46,6 +46,17 @@ export class AuthService {
           }),
         ),
       );
+  }
+
+  updateAccount(changes: UpdateAccount): Observable<User> {
+    return this.http.put<User>(`${API_BASE_URL}/users/me`, changes).pipe(
+      tap((user) => {
+        const session = this._session();
+        if (session) {
+          this.persist({ ...session, user });
+        }
+      }),
+    );
   }
 
   logout(): void {

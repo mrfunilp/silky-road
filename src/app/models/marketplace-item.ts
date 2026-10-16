@@ -7,14 +7,10 @@ export interface MarketplaceItem {
   name: string;
   biography: string | null;
   createdAt: string;
-  updatedAt: string;
   creator: UserSummary;
-  likes: number;
-  views: number;
   price: number;
   currency: string;
   category: string | null;
-  tags: string[];
   imageUrls: string[];
   status: MarketplaceItemStatus;
 }
@@ -25,7 +21,9 @@ export interface CreateMarketplaceItem {
   price: number;
   currency: string;
   category?: string;
-  tags?: string[];
-  imageUrls?: string[];
   status?: MarketplaceItemStatus;
+}
+
+export interface UpdateMarketplaceItem extends CreateMarketplaceItem {
+  status: MarketplaceItemStatus;
 }

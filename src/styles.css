@@ -144,6 +144,15 @@
       4px 0 8px -4px rgb(10 36 106 / 0.16);
   }
 
+  .xp-page {
+    @apply flex min-h-dvh flex-col gap-3 p-4;
+  }
+
+  .xp-card-grid {
+    @apply grid gap-2;
+    grid-template-columns: repeat(auto-fill, minmax(17rem, 1fr));
+  }
+
   .xp-content {
     @apply min-w-0 flex-1 bg-white;
     box-shadow: inset 8px 0 10px -10px rgb(10 36 106 / 0.22);

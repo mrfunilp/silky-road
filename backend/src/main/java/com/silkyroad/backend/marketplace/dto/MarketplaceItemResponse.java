@@ -11,13 +11,9 @@ public record MarketplaceItemResponse(
         String name,
         String biography,
         UserSummaryResponse creator,
-        long likes,
-        long views,
         BigDecimal price,
         String currency,
         String category,
-        List<String> tags,
         List<String> imageUrls,
         String status,
-        Instant createdAt,
-        Instant updatedAt) {}
+        Instant createdAt) {}

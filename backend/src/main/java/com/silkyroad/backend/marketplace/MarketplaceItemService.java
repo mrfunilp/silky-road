@@ -2,6 +2,7 @@ package com.silkyroad.backend.marketplace;
 
 import com.silkyroad.backend.common.ForbiddenException;
 import com.silkyroad.backend.common.NotFoundException;
+import com.silkyroad.backend.marketplace.comment.ItemCommentRepository;
 import com.silkyroad.backend.marketplace.dto.CreateMarketplaceItemRequest;
 import com.silkyroad.backend.marketplace.dto.MarketplaceItemResponse;
 import com.silkyroad.backend.marketplace.dto.UpdateMarketplaceItemRequest;
@@ -11,22 +12,31 @@ import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Transactional(readOnly = true)
 public class MarketplaceItemService {
 
+    public static final int MAX_IMAGES_PER_ITEM = 3;
+
     private final MarketplaceItemRepository itemRepository;
     private final MarketplaceItemMapper itemMapper;
     private final UserService userService;
+    private final ImageStorageService imageStorage;
+    private final ItemCommentRepository commentRepository;
 
     public MarketplaceItemService(
             MarketplaceItemRepository itemRepository,
             MarketplaceItemMapper itemMapper,
-            UserService userService) {
+            UserService userService,
+            ImageStorageService imageStorage,
+            ItemCommentRepository commentRepository) {
         this.itemRepository = itemRepository;
         this.itemMapper = itemMapper;
         this.userService = userService;
+        this.imageStorage = imageStorage;
+        this.commentRepository = commentRepository;
     }
 
     public List<MarketplaceItemResponse> findAll(UUID creatorId, String status) {
@@ -64,7 +74,36 @@ public class MarketplaceItemService {
     public void delete(UUID id, UUID actingUserId) {
         MarketplaceItem item = getOrThrow(id);
         requireOwner(item, actingUserId);
+        List<String> images = List.copyOf(item.getImageUrls());
+        commentRepository.deleteAllByItemId(id);
         itemRepository.delete(item);
+        itemRepository.flush();
+        images.forEach(imageStorage::delete);
+    }
+
+    @Transactional
+    public MarketplaceItemResponse addImage(UUID id, MultipartFile file, UUID actingUserId) {
+        MarketplaceItem item = itemRepository.findByIdForUpdate(id)
+                .orElseThrow(() -> new NotFoundException("No marketplace item with id " + id));
+        requireOwner(item, actingUserId);
+        if (item.getImageUrls().size() >= MAX_IMAGES_PER_ITEM) {
+            throw new IllegalArgumentException("An item can have at most " + MAX_IMAGES_PER_ITEM + " images.");
+        }
+
+        String name = imageStorage.store(file);
+        item.getImageUrls().add(name);
+        return itemMapper.toResponse(item);
+    }
+
+    @Transactional
+    public MarketplaceItemResponse removeImage(UUID id, String name, UUID actingUserId) {
+        MarketplaceItem item = getOrThrow(id);
+        requireOwner(item, actingUserId);
+        if (!item.getImageUrls().remove(name)) {
+            throw new NotFoundException("That item has no image " + name);
+        }
+        imageStorage.delete(name);
+        return itemMapper.toResponse(item);
     }
 
     private void requireOwner(MarketplaceItem item, UUID actingUserId) {

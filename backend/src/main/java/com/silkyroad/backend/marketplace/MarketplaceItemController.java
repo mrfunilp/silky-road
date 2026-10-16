@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.List;
 import java.util.UUID;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/items")
@@ -61,6 +63,18 @@ public class MarketplaceItemController {
     public ResponseEntity<Void> delete(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
         itemService.delete(id, callerId(jwt));
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(path = "/{id}/images", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public MarketplaceItemResponse addImage(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @RequestParam("file") MultipartFile file) {
+        return itemService.addImage(id, file, callerId(jwt));
+    }
+
+    @DeleteMapping("/{id}/images/{name}")
+    public MarketplaceItemResponse removeImage(
+            @AuthenticationPrincipal Jwt jwt, @PathVariable UUID id, @PathVariable String name) {
+        return itemService.removeImage(id, name, callerId(jwt));
     }
 
     private UUID callerId(Jwt jwt) {

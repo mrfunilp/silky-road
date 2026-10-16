@@ -20,7 +20,6 @@ function passwordsMatch(group: AbstractControl): ValidationErrors | null {
   selector: 'app-registration',
   imports: [ReactiveFormsModule, RouterLink],
   templateUrl: './registration.html',
-  styleUrl: './registration.css',
 })
 export class Registration {
   private readonly fb = inject(FormBuilder);

@@ -1,0 +1,189 @@
+<div class="xp-page">
+  <div class="flex items-center justify-between">
+    <h1 class="text-base font-bold text-xp-blue">Your Items</h1>
+    <button class="xp-button" type="button" (click)="load()" [disabled]="loading()">Refresh</button>
+  </div>
+
+  @if (error()) {
+    <p class="xp-error-box">{{ error() }}</p>
+  }
+
+  <div class="flex flex-1 flex-col gap-3 xl:flex-row">
+    <div class="xp-groupbox xl:w-[30rem] xl:shrink-0 xl:self-start">
+      <p class="xp-legend mb-2">
+        @if (editing(); as item) {
+          Edit "{{ item.name }}"
+        } @else {
+          New Listing
+        }
+      </p>
+
+      <form [formGroup]="form" (ngSubmit)="save()" class="space-y-2" novalidate>
+        <div class="grid grid-cols-1 gap-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-2">
+          <div>
+            <label for="name" class="xp-label">Name:</label>
+            <input id="name" type="text" formControlName="name" class="xp-input mt-1" />
+            @if (form.controls.name.touched && form.controls.name.invalid) {
+              <p class="xp-error-text">A name is required (max. 120 characters).</p>
+            }
+          </div>
+
+          <div>
+            <label for="category" class="xp-label">Category:</label>
+            <input id="category" type="text" formControlName="category" class="xp-input mt-1" />
+            @if (form.controls.category.touched && form.controls.category.invalid) {
+              <p class="xp-error-text">Max. 60 characters.</p>
+            }
+          </div>
+
+          <div>
+            <label for="status" class="xp-label">Status:</label>
+            <select id="status" formControlName="status" class="xp-input mt-1">
+              @for (status of statuses; track status) {
+                <option [value]="status">{{ status }}</option>
+              }
+            </select>
+          </div>
+
+          <div>
+            <label for="price" class="xp-label">Price:</label>
+            <input
+              id="price"
+              type="number"
+              step="0.01"
+              min="0"
+              formControlName="price"
+              class="xp-input mt-1"
+            />
+            @if (form.controls.price.touched && form.controls.price.invalid) {
+              <p class="xp-error-text">Enter a price of 0 or more.</p>
+            }
+          </div>
+
+          <div>
+            <label for="currency" class="xp-label">Currency:</label>
+            <input
+              id="currency"
+              type="text"
+              maxlength="3"
+              formControlName="currency"
+              class="xp-input mt-1"
+            />
+            @if (form.controls.currency.touched && form.controls.currency.invalid) {
+              <p class="xp-error-text">Use a 3-letter code, e.g. EUR.</p>
+            }
+          </div>
+        </div>
+
+        <div>
+          <label for="biography" class="xp-label">Description:</label>
+          <textarea
+            id="biography"
+            rows="3"
+            formControlName="biography"
+            class="xp-input mt-1"
+          ></textarea>
+          @if (form.controls.biography.touched && form.controls.biography.invalid) {
+            <p class="xp-error-text">Max. 2000 characters.</p>
+          }
+        </div>
+
+        <div>
+          <p class="xp-label">Pictures ({{ maxImages - slotsLeft() }} of {{ maxImages }}):</p>
+
+          <div class="mt-1 flex flex-wrap items-start gap-2">
+            @for (url of editing()?.imageUrls ?? []; track url) {
+              <div class="xp-window p-1">
+                <img [src]="url" alt="" class="h-20 w-20 object-cover" />
+                <button
+                  type="button"
+                  class="xp-button mt-1 w-full px-1 text-xs"
+                  (click)="removeImage(url)"
+                >
+                  Remove
+                </button>
+              </div>
+            }
+
+            @for (file of pendingFiles(); track file) {
+              <div class="xp-window flex h-[7.25rem] w-[5.75rem] flex-col justify-between p-1">
+                <p class="break-all text-xs text-[#555]">{{ file.name }}</p>
+                <p class="text-xs text-xp-blue">uploads on save</p>
+                <button
+                  type="button"
+                  class="xp-button w-full px-1 text-xs"
+                  (click)="removePending(file)"
+                >
+                  Remove
+                </button>
+              </div>
+            }
+
+            @if (slotsLeft() > 0) {
+              <label
+                class="xp-button flex h-[7.25rem] w-[5.75rem] items-center justify-center text-center text-xs"
+              >
+                Add picture...
+                <input
+                  #fileInput
+                  type="file"
+                  multiple
+                  class="hidden"
+                  [accept]="imageAccept"
+                  (change)="onFilesSelected(fileInput)"
+                />
+              </label>
+            }
+          </div>
+
+          <p class="mt-1 text-xs text-[#555]">JPEG, PNG, GIF or WebP, max. 5 MB each.</p>
+          @if (fileError()) {
+            <p class="xp-error-text">{{ fileError() }}</p>
+          }
+        </div>
+
+        <div class="flex justify-end gap-2">
+          @if (editing()) {
+            <button type="button" class="xp-button" (click)="cancelEdit()">Cancel</button>
+          }
+          <button type="submit" class="xp-button xp-button-default" [disabled]="saving()">
+            {{ saving() ? 'Saving...' : editing() ? 'Save Changes' : 'Add Item' }}
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <div class="xp-groupbox flex-1">
+      <p class="xp-legend mb-2">Your Listings ({{ items().length }})</p>
+
+      @if (loading()) {
+        <p class="text-sm text-[#555]">Loading...</p>
+      } @else if (items().length === 0) {
+        <p class="text-sm text-[#555]">You have not listed anything yet.</p>
+      } @else {
+        <div class="xp-card-grid">
+          @for (item of items(); track item.id) {
+            <app-item-card
+              [item]="item"
+              [showCreator]="false"
+              [class.outline-2]="editing()?.id === item.id"
+              [class.outline-xp-blue-light]="editing()?.id === item.id"
+            >
+              <div class="mt-2 flex flex-wrap gap-1">
+                <a [routerLink]="['/items', item.id]" class="xp-button px-2 text-xs no-underline"
+                  >Details</a
+                >
+                <button type="button" class="xp-button px-2 text-xs" (click)="startEdit(item)">
+                  Edit
+                </button>
+                <button type="button" class="xp-button px-2 text-xs" (click)="removeItem(item)">
+                  Delete
+                </button>
+              </div>
+            </app-item-card>
+          }
+        </div>
+      }
+    </div>
+  </div>
+</div>

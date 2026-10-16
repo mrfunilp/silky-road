@@ -6,8 +6,9 @@ import com.silkyroad.backend.common.UnauthorizedException;
 import com.silkyroad.backend.user.dto.AuthResponse;
 import com.silkyroad.backend.user.dto.CreateUserRequest;
 import com.silkyroad.backend.user.dto.LoginRequest;
+import com.silkyroad.backend.user.dto.UpdateAccountRequest;
+import com.silkyroad.backend.user.dto.UserProfileResponse;
 import com.silkyroad.backend.user.dto.UserResponse;
-import java.util.List;
 import java.util.UUID;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -33,12 +34,8 @@ public class UserService {
         this.tokenService = tokenService;
     }
 
-    public List<UserResponse> findAll() {
-        return userRepository.findAll().stream().map(userMapper::toResponse).toList();
-    }
-
-    public UserResponse findById(UUID id) {
-        return userMapper.toResponse(getOrThrow(id));
+    public UserProfileResponse findProfile(UUID id) {
+        return userMapper.toProfile(getOrThrow(id));
     }
 
     public User getOrThrow(UUID id) {
@@ -60,6 +57,31 @@ public class UserService {
 
         User saved = userRepository.save(new User(username, email, passwordEncoder.encode(request.password())));
         return userMapper.toResponse(saved);
+    }
+
+    @Transactional
+    public UserResponse updateAccount(UUID id, UpdateAccountRequest request) {
+        User user = getOrThrow(id);
+        if (!passwordEncoder.matches(request.currentPassword(), user.getPasswordHash())) {
+            throw new IllegalArgumentException("Your current password is incorrect.");
+        }
+
+        String username = request.username().trim();
+        String email = request.email().trim();
+
+        if (!username.equalsIgnoreCase(user.getUsername()) && userRepository.existsByUsernameIgnoreCase(username)) {
+            throw new DuplicateResourceException("That username is already taken.");
+        }
+        if (!email.equalsIgnoreCase(user.getEmail()) && userRepository.existsByEmailIgnoreCase(email)) {
+            throw new DuplicateResourceException("An account with that email already exists.");
+        }
+
+        user.setUsername(username);
+        user.setEmail(email);
+        if (request.newPassword() != null) {
+            user.setPasswordHash(passwordEncoder.encode(request.newPassword()));
+        }
+        return userMapper.toResponse(user);
     }
 
     public AuthResponse login(LoginRequest request) {
