@@ -6,6 +6,7 @@ import com.silkyroad.backend.user.dto.LoginRequest;
 import com.silkyroad.backend.user.dto.UpdateAccountRequest;
 import com.silkyroad.backend.user.dto.UserProfileResponse;
 import com.silkyroad.backend.user.dto.UserResponse;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import java.net.URI;
 import java.util.UUID;
@@ -47,7 +48,7 @@ public class UserController {
     }
 
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody LoginRequest request) {
-        return userService.login(request);
+    public AuthResponse login(@Valid @RequestBody LoginRequest request, HttpServletRequest httpRequest) {
+        return userService.login(request, httpRequest.getRemoteAddr());
     }
 }

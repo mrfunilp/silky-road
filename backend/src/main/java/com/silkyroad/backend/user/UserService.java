@@ -22,16 +22,19 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
     private final TokenService tokenService;
+    private final LoginRateLimiter loginRateLimiter;
 
     public UserService(
             UserRepository userRepository,
             UserMapper userMapper,
             PasswordEncoder passwordEncoder,
-            TokenService tokenService) {
+            TokenService tokenService,
+            LoginRateLimiter loginRateLimiter) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.passwordEncoder = passwordEncoder;
         this.tokenService = tokenService;
+        this.loginRateLimiter = loginRateLimiter;
     }
 
     public UserProfileResponse findProfile(UUID id) {
@@ -84,10 +87,18 @@ public class UserService {
         return userMapper.toResponse(user);
     }
 
-    public AuthResponse login(LoginRequest request) {
-        User user = userRepository.findByUsernameIgnoreCase(request.username().trim())
+    public AuthResponse login(LoginRequest request, String clientIp) {
+        String username = request.username().trim();
+        loginRateLimiter.checkAllowed(username, clientIp);
+
+        User user = userRepository.findByUsernameIgnoreCase(username)
                 .filter(candidate -> passwordEncoder.matches(request.password(), candidate.getPasswordHash()))
-                .orElseThrow(() -> new UnauthorizedException("Invalid username or password."));
+                .orElseThrow(() -> {
+                    loginRateLimiter.recordFailure(username, clientIp);
+                    return new UnauthorizedException("Invalid username or password.");
+                });
+
+        loginRateLimiter.recordSuccess(username);
 
         TokenService.IssuedToken issued = tokenService.issue(user);
         return new AuthResponse(issued.token(), issued.expiresIn(), userMapper.toResponse(user));
