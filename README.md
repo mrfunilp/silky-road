@@ -1,49 +1,35 @@
-# SilkyRoaf
+# SilkyRoad
 
-This project was generated using [Angular CLI](https://github.com/angular/angular-cli) version 21.2.2.
+A small marketplace web app: list items, add pictures, and comment on other
+people's listings. Angular frontend, Spring Boot backend, PostgreSQL database.
 
-## Development server
+## Run it
 
-To start a local development server, run:
-
-```bash
-ng serve
-```
-
-Once the server is running, open your browser and navigate to `http://localhost:4200/`. The application will automatically reload whenever you modify any of the source files.
-
-## Code scaffolding
-
-Angular CLI includes powerful code scaffolding tools. To generate a new component, run:
+You only need Docker Desktop. From this folder:
 
 ```bash
-ng generate component component-name
+cp .env.example .env      # Windows PowerShell: copy .env.example .env
+docker compose up --build
 ```
 
-For a complete list of available schematics (such as `components`, `directives`, or `pipes`), run:
+Then open <http://localhost:8081>.
 
-```bash
-ng generate --help
-```
+The first time, click **Create one** on the login page to register an account.
 
-## Building
+To stop it: `docker compose down` (add `-v` to also wipe the database).
 
-To build the project run:
+## What runs where
 
-```bash
-ng build
-```
+| Part     | URL / Access                          |
+| -------- | ------------------------------------- |
+| Frontend | <http://localhost:8081>               |
+| API      | <http://localhost:8081/api>           |
+| Database | inside Docker only (not exposed)      |
 
-This will compile your project and store the build artifacts in the `dist/` directory. By default, the production build optimizes your application for performance and speed.
+Look at the database with: `docker compose exec db psql -U silkyroad silkyroad`
 
-## Running unit tests
+## Notes
 
-To execute unit tests with the [Vitest](https://vitest.dev/) test runner, use the following command:
-
-```bash
-ng test
-```
-
-
-
-
+- `.env` holds the JWT secret and is git-ignored. Copy it from `.env.example`;
+  the app will not start without `SILKYROAD_JWT_SECRET` set.
+- Frontend lives in this folder, the backend in `backend/` (see `backend/README.md`).

@@ -38,3 +38,6 @@ Thumbs.db
 .claude/settings.local.json
 CLAUDE.md
 CLAUDE.local.md
+
+# Local secrets for docker compose
+.env

@@ -6,9 +6,9 @@ services:
     environment:
       POSTGRES_DB: silkyroad
       POSTGRES_USER: silkyroad
-      POSTGRES_PASSWORD: silkyroad
-    ports:
-      - "5432:5432"
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env (copy .env.example)}
+    # No ports published: the database is reachable only from the backend over
+    # the internal Docker network. Inspect it with: docker compose exec db psql -U silkyroad silkyroad
     volumes:
       - db-data:/var/lib/postgresql
     healthcheck:
@@ -28,8 +28,9 @@ services:
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/silkyroad
       SPRING_DATASOURCE_USERNAME: silkyroad
-      SPRING_DATASOURCE_PASSWORD: silkyroad
+      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
       SILKYROAD_IMAGES_DIR: /data/images
+      SILKYROAD_JWT_SECRET: ${SILKYROAD_JWT_SECRET:?set SILKYROAD_JWT_SECRET in .env (copy .env.example)}
     volumes:
       - item-images:/data/images
 

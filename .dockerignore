@@ -8,3 +8,5 @@ backend/
 .idea/
 README.md
 CLAUDE.md
+.env
+.env.example
