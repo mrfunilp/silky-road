@@ -29,8 +29,11 @@ services:
       - /tmp:rw
     environment:
       SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/silkyroad
-      SPRING_DATASOURCE_USERNAME: silkyroad
-      SPRING_DATASOURCE_PASSWORD: ${POSTGRES_PASSWORD}
+      SPRING_DATASOURCE_USERNAME: silkyroad_app
+      SPRING_DATASOURCE_PASSWORD: ${APP_DB_PASSWORD:?set APP_DB_PASSWORD in .env (copy .env.example)}
+      SPRING_FLYWAY_USER: silkyroad
+      SPRING_FLYWAY_PASSWORD: ${POSTGRES_PASSWORD}
+      APP_DB_PASSWORD: ${APP_DB_PASSWORD}
       SILKYROAD_IMAGES_DIR: /data/images
       SILKYROAD_JWT_SECRET: ${SILKYROAD_JWT_SECRET:?set SILKYROAD_JWT_SECRET in .env (copy .env.example)}
     volumes:
