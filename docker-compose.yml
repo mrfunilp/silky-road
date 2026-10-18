@@ -3,6 +3,10 @@ name: silkyroad
 services:
   db:
     image: postgres:18-alpine
+    read_only: true
+    tmpfs:
+      - /tmp:rw
+      - /var/run/postgresql:rw
     environment:
       POSTGRES_DB: silkyroad
       POSTGRES_USER: silkyroad
