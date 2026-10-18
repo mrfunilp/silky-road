@@ -21,10 +21,6 @@
         <div class="min-w-0 flex-1 text-sm">
           <p class="text-base font-bold">{{ profile.username }}</p>
           <p>
-            <span class="text-[#555]">Contact:</span>
-            <a [href]="'mailto:' + profile.email" class="xp-link">{{ profile.email }}</a>
-          </p>
-          <p>
             <span class="text-[#555]">Member since:</span> {{ profile.createdAt.substring(0, 10) }}
           </p>
           <p><span class="text-[#555]">Listings:</span> {{ items().length }}</p>

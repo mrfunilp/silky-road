@@ -13,8 +13,7 @@ public class UserMapper {
     }
 
     public UserProfileResponse toProfile(User user) {
-        return new UserProfileResponse(
-                user.getId(), user.getUsername(), user.getEmail(), user.getCreatedAt());
+        return new UserProfileResponse(user.getId(), user.getUsername(), user.getCreatedAt());
     }
 
     public UserSummaryResponse toSummary(User user) {
