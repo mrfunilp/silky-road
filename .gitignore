@@ -39,5 +39,8 @@ Thumbs.db
 CLAUDE.md
 CLAUDE.local.md
 
-# Local secrets for docker compose
+
 .env
+
+# Security notes, kept local
+HARDENING.md
