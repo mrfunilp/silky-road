@@ -7,7 +7,7 @@ export interface User {
 
 export type UserSummary = Pick<User, 'id' | 'username'>;
 
-export type UserProfile = Pick<User, 'id' | 'username' | 'createdAt'>;
+export type UserProfile = Pick<User, 'id' | 'username' | 'email' | 'createdAt'>;
 
 export interface UpdateAccount {
   username: string;
